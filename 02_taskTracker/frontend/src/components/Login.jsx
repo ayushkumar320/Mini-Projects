@@ -14,7 +14,7 @@ function Login() {
         email,
         password,
       });
-      // send the token to local storage
+      // Send the token to local storage
       localStorage.setItem("token", `Bearer ${res.data.token}`);
       // Clear the input from and show success message
       emailRef.current.value = "";
