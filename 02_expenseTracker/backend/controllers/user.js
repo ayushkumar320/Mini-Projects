@@ -93,7 +93,7 @@ export async function addTask(req, res) {
 }
 
 export async function maskAsComplete(req, res) {
-  const {taskId} = req.body;
+  const taskId = req.params.id;
   try {
     const task = await Task.findById(taskId);
     if (!task) {
@@ -116,14 +116,14 @@ export async function maskAsComplete(req, res) {
 }
 
 export async function editTask(req, res) {
-  const {taskId, title, description, completed} = req.body;
+  const taskId = req.params.id;
+  const {title, description} = req.body;
   try {
     const task = await Task.findByIdAndUpdate(
       taskId,
       {
         title: title,
         description: description,
-        completed: completed,
       },
       {new: true}
     );
@@ -144,6 +144,48 @@ export async function editTask(req, res) {
     });
   } catch (error) {
     console.error("Error updating task:", error);
+    return res.status(500).json({
+      message: "Internal server error",
+    });
+  }
+}
+
+export async function deleteTask(req, res) {
+  const taskId = req.params.id;
+  try {
+    const task = await Task.findById(taskId);
+    if (!task) {
+      return res.status(404).json({
+        message: "Task not found",
+      });
+    }
+    // Verify task belongs to the authenticated user
+    if (task.user.toString() !== req.user._id.toString()) {
+      return res.status(403).json({
+        message: "Not authorized to delete this task",
+      });
+    }
+    await Task.findByIdAndDelete(taskId);
+    return res.json({
+      message: "Task deleted successfully",
+    });
+  } catch (error) {
+    console.error("Error deleting task:", error);
+    return res.status(500).json({
+      message: "Internal server error",
+    });
+  }
+}
+
+export async function getTasks(req, res) {
+  try {
+    const tasks = await Task.find({user: req.user._id});
+    return res.json({
+      message: "Tasks fetched successfully",
+      tasks: tasks,
+    });
+  } catch (error) {
+    console.error("Error fetching tasks:", error);
     return res.status(500).json({
       message: "Internal server error",
     });
