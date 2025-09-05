@@ -14,9 +14,17 @@ function Login() {
         email,
         password,
       });
-      // Send the token to local storage
-      localStorage.setItem("token", `Bearer ${res.data.token}`);
-      // Clear the input from and show success message
+      // Save the token to localStorage (without Bearer prefix)
+      localStorage.setItem("token", res.data.token);
+
+      // Send the token to header for future protected requests, no need to store them in localStorage
+      // Set axios default Authorization header for future requests
+      
+      axios.defaults.headers.common[
+        "Authorization"
+      ] = `Bearer ${res.data.token}`;
+
+      // Clear the input form and show success message
       emailRef.current.value = "";
       passwordRef.current.value = "";
       alert("Login successful!");
