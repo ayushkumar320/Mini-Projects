@@ -1,8 +1,15 @@
 import "./Home.css";
 import {useNavigate} from "react-router-dom";
+import {useState, useEffect} from "react";
 
 function Home() {
   const navigate = useNavigate();
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    setIsLoggedIn(!!token);
+  }, []);
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen w-full px-4 sm:px-0">
@@ -11,23 +18,51 @@ function Home() {
         <p className="text-lg sm:text-xl mt-2 sm:mt-4">
           Welcome to the To-Do List application!
         </p>
-        <p className="text-lg sm:text-xl mt-2 sm:mt-4">
-          Please login to access your tasks.
-        </p>
-        <div className="flex flex-col sm:flex-row justify-center items-center gap-4 mt-4">
-          <button
-            className="bg-blue-500 text-white py-2 px-6 rounded hover:cursor-pointer hover:bg-blue-900 w-full sm:w-auto"
-            onClick={() => navigate("/login")}
-          >
-            Login
-          </button>
-          <button
-            className="bg-green-500 text-white py-2 px-6 rounded hover:cursor-pointer hover:bg-green-900 w-full sm:w-auto"
-            onClick={() => navigate("/register")}
-          >
-            Register
-          </button>
-        </div>
+
+        {isLoggedIn ? (
+          <>
+            <p className="text-lg sm:text-xl mt-2 sm:mt-4">
+              You are logged in! Ready to manage your tasks?
+            </p>
+            <div className="flex flex-col sm:flex-row justify-center items-center gap-4 mt-4">
+              <button
+                className="bg-green-500 text-white py-2 px-6 rounded hover:cursor-pointer hover:bg-green-900 w-full sm:w-auto"
+                onClick={() => navigate("/tasks")}
+              >
+                Go to Tasks
+              </button>
+              <button
+                className="bg-red-500 text-white py-2 px-6 rounded hover:cursor-pointer hover:bg-red-900 w-full sm:w-auto"
+                onClick={() => {
+                  localStorage.removeItem("token");
+                  setIsLoggedIn(false);
+                }}
+              >
+                Logout
+              </button>
+            </div>
+          </>
+        ) : (
+          <>
+            <p className="text-lg sm:text-xl mt-2 sm:mt-4">
+              Please login to access your tasks.
+            </p>
+            <div className="flex flex-col sm:flex-row justify-center items-center gap-4 mt-4">
+              <button
+                className="bg-blue-500 text-white py-2 px-6 rounded hover:cursor-pointer hover:bg-blue-900 w-full sm:w-auto"
+                onClick={() => navigate("/login")}
+              >
+                Login
+              </button>
+              <button
+                className="bg-green-500 text-white py-2 px-6 rounded hover:cursor-pointer hover:bg-green-900 w-full sm:w-auto"
+                onClick={() => navigate("/register")}
+              >
+                Register
+              </button>
+            </div>
+          </>
+        )}
       </div>
     </div>
   );

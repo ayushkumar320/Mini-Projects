@@ -1,10 +1,12 @@
 import {useRef} from "react";
+import {useNavigate} from "react-router-dom";
 import axios from "axios";
 import "./Login.css";
 
 function Login() {
   const emailRef = useRef();
   const passwordRef = useRef();
+  const navigate = useNavigate();
 
   async function sendLoginRequest() {
     const email = emailRef.current.value;
@@ -14,12 +16,10 @@ function Login() {
         email,
         password,
       });
-      // Save the token to localStorage (without Bearer prefix)
+      // Save only the raw token to localStorage
       localStorage.setItem("token", res.data.token);
 
-      // Send the token to header for future protected requests, no need to store them in localStorage
       // Set axios default Authorization header for future requests
-      
       axios.defaults.headers.common[
         "Authorization"
       ] = `Bearer ${res.data.token}`;
@@ -28,6 +28,9 @@ function Login() {
       emailRef.current.value = "";
       passwordRef.current.value = "";
       alert("Login successful!");
+
+      // Redirect to tasks page
+      navigate("/tasks");
     } catch (error) {
       alert("Login failed. Please check your credentials.");
       console.error(error);
